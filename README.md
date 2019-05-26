@@ -50,8 +50,11 @@ classdef Species
         traits = [];
         population = 0;
 ```
-Every species has a name, defined as a positive integer, e.g. ```name = 1``` .
-A trait-based modelling approach is used. Traits can be
+* **`name`** Every species has a name, defined as a positive integer
+* **`traits`** traits are 
+* **`population`** population size defined as a positive real number
+
+
 
 ![alt text](https://github.com/scaralbi/plankton-simulator/blob/master/species.png)
 
@@ -66,9 +69,11 @@ classdef Deme
     properties
         nutrient_concentrations = [];
         nutrient_supply = [];
-        species composition = [];
+        species_composition = [];
 ```
-
+* **`nutrient_concentrations:`** concentration of each nutrient
+* **`nutrient_supply:`** rate of nutrient supply
+* **`species composition:`** list of Species objects, representing the species present within the deme
 
 # Plankton.m 
 
@@ -79,6 +84,8 @@ classdef Plankton
         size = [];
     end
 ```
+* **`demes:`** matrix of Demes objects
+* **`size:`** dimensions of demes matrix
 
 
 # simulator.m 
@@ -91,16 +98,12 @@ This is the main function of the plankton-simulator. It executes config.mat file
 1. Init
 2. Evolve metabolic strategies (drawn from uniform distribution)
 3. Specify nutrient types and supplies
-4. 
+4. Simulate
 
 # config.m 
 The file ```params_guide.txt``` contains a list of the reference parameter
 
 
-# Functions
-## simulate
-### natural selection
-### shuffle
 
 
 
