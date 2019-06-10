@@ -65,6 +65,17 @@ classdef Deme
             end
             survivors = char(survivors);
         end
+        
+        
+         function obj = evolve(obj, N)
+            n = obj.num_species();
+            for i = 1:n
+                N = N + 1;
+%                 [obj.composition(i), obj.composition(n+i)] = obj.composition(i).evolve(N);
+                [obj.composition(i), obj.composition(N)] = obj.composition(i).evolve(N);
+
+            end
+          end
       
         function obj = simulate(obj, options)
             %% ODE Params
@@ -101,4 +112,7 @@ classdef Deme
     end % methods
 end %Class
 
+        
+         
 
+       

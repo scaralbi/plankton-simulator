@@ -1,4 +1,5 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+       
 classdef Plankton
 %     Class defining the global pool 
     
@@ -28,11 +29,22 @@ classdef Plankton
             n = numel(obj.demes);
         end
         
+        
         %num_species = compute number of species in the plankton
         function N = num_species(obj)
-            n = obj.num_demes();
-            N = obj.demes(1,1).capacity * n;
-  
+            dims = obj.dim_demes();
+            rows = dims(1);
+            cols = dims(2);
+            species_list = [];
+                for row = 1 :rows
+                    for col = 1 : cols
+                        deme_compos = obj.demes(row, col).composition;
+                        for i = 1:length(deme_compos)
+                            species_list(deme_compos(i).name) = 1;
+                        end
+                    end
+                end
+                N = sum(species_list);
         end
         
         
@@ -267,6 +279,50 @@ classdef Plankton
             end  
         end
     end
+    
+    
+     % EVOLVE
+    % = Evolve demes
+        function obj = evolve(obj)
+     
+            % 1. Unite all species into global pool
+            species_list = obj.composition();
+
+            % 2. Evolve all species
+            mutatedSpecies_list = obj.composition();
+            for i = 1:length(species_list)
+                [old_species, new_species] = species_list(i).evolve(length(species_list)+i-1);
+                species_list(i) = old_species;
+                mutatedSpecies_list(i) = new_species;
+            end
+
+            % 3. Reassign old and new species to demes
+            dims = obj.dim_demes();
+            rows = dims(1);
+            cols = dims(2);
+            for i = 1:rows
+                for j = 1:cols
+                    deme_comp = obj.demes(i,j).composition;
+
+                    for s = randi(length(deme_comp))
+                        species_name = deme_comp(s).name;
+
+                        contribution = 0;
+                        if species_list(species_name).population + mutatedSpecies_list(species_name).population > 0
+                            contribution = deme_comp(s).population / (species_list(species_name).population + mutatedSpecies_list(species_name).population);
+                        end
+
+                        old_species_left = species_list(species_name).population * contribution;
+                        new_species_add = mutatedSpecies_list(species_name).population * contribution;
+                        obj.demes(i,j).local_pool(species_name) = old_species_left;
+                        obj.demes(i,j).local_pool = [obj.demes(i,j).local_pool new_species_add];
+                        obj.demes(i,j).composition = [obj.demes(i,j).composition species_update(mutatedSpecies_list(species_name), new_species_add)];
+                        obj.demes(i,j).local_traits = [obj.demes(i,j).local_traits; mutatedSpecies_list(species_name).traits];
+
+                    end
+                end  
+            end
+        end 
        
-    end % methods
+    end % methods   
 end %Class
